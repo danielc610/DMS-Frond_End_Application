@@ -1,0 +1,98 @@
+﻿@model PagedList.IPagedList<DMS_FEA.Models.OCOM>
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "Manage Companies - Overview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>@ViewBag.Title</h3>
+<br />
+
+@{ int rowNo = 0;}
+
+@using (Html.BeginForm("Index", "Company", FormMethod.Get))
+{
+    <div class="form-group">
+        @Html.Label("Company Name", htmlAttributes: new { @class = "control-label col-sm-1"})
+        <div class="col-md-3">
+            @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, htmlAttributes: new { @class = "form-control"} )
+        </div>
+        <div class="col-md-6">
+            <input type="submit" value="Search" class="btn btn-default" />
+        </div>
+        <div class="col-md-2">
+            <a href="@Url.Action("Create", "Company")", class ="btn btn-default">Create Company
+            </a>
+        </div>
+        <br /><br />
+    </div>
+}
+<div style="overflow-x:auto">
+    <div class="table">
+        <table class="table col-md-12" style="table-layout:fixed">
+            <tr>
+                <th class="col-sm-1" style="text-align: center">
+                    #
+                </th>
+                <th class="col-md-2">
+                    @Html.ActionLink("Company Code", "Index", new { sortOrder = ViewBag.CompCodeSortParm, currentFilter = ViewBag.CurrentFilter })
+                </th>
+                <th class="col-md-6">
+                    @Html.ActionLink("Company Name", "Index", new { sortOrder = ViewBag.CompNameSortParm, currentFilter = ViewBag.CurrentFilter })
+                </th>
+                <th class="col-md-2">
+                    @Html.ActionLink("Folder Name", "Index", new { sortOrder = ViewBag.FolderNameSortParm, currentFilter = ViewBag.CurrentFilter })
+                </th>
+                <th class="col-md-2">
+                    @Html.ActionLink("Active", "Index", new { sortOrder = ViewBag.ActiveSortParm, currentFilter = ViewBag.CurrentFilter })
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                var size = int.Parse(Model.PageSize.ToString());
+                var pageNumber = Model.PageNumber - 1;
+                rowNo += 1;
+                <tr>
+                    <td style="text-align: center">
+                        @(rowNo + size * pageNumber) 
+                    </td>
+                    <td class="col-md-2">
+                        <a href="@Url.Action("Update", "Company", new { id = item.DocNum})">@Html.DisplayFor(modelItem => item.Comp_Code)</a>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Comp_Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Fname)
+                    </td>
+                    <td>
+                    @Html.DisplayFor(modelItem => item.Active)
+                    </td>
+                    <td></td>
+                    
+            </tr>
+            
+            }
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+        </table>
+        <br />
+    </div>
+</div>
+<br/>
+
+<div class="pagination">
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+</div>
+

@@ -1,0 +1,97 @@
+﻿@model DMS_FEA.ViewModels.CreateDeptViewModel
+
+
+@{
+    ViewBag.Title = "Manage Department - Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var comp = $("#list1");
+        var deptCode = $("#deptCode");
+        var deptName = $("#deptName");
+        var deptFld = $("#deptFld");
+
+        comp.on("change", function () {
+            var compID = $(this).val();
+            if (compID != null) {
+                deptCode.prop("readonly", false);
+                deptName.prop("readonly", false);
+                deptFld.prop("readonly", false);
+            }
+        })
+    })
+</script>
+
+<h3>@ViewBag.Title</h3>
+<br />
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "createDeptForm"}))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger"})
+        <div class="form-group">
+            @Html.LabelFor(model => model.Comp_ID, htmlAttributes: new { @class = "control-label col-md-2"})
+            <div class="col-md-10">
+                @Html.DropDownList("Comp_ID", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control", @id = "list1" })
+                @Html.ValidationMessageFor(model => model.Comp_ID, "", new { @class = "text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Dept_Code, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Dept_Code, new { htmlAttributes = new { @class = "form-control", @id = "deptCode", @readonly = true} })
+                @Html.ValidationMessageFor(model => model.Dept_Code, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Dept_Name, htmlAttributes: new { @class = "control-label col-md-2"} )
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Dept_Name, htmlAttributes: new {@class = "form-control", @readonly = true, @id = "deptName" })
+                @Html.ValidationMessageFor(model => model.Dept_Name, "", new { @class="text-danger"})
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ShortName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ShortName, new { htmlAttributes = new {@class = "form-control", @readonly = true, @id = "deptFld" } })
+                @Html.ValidationMessageFor(model => model.ShortName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Active, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="checkbox">
+                    @Html.EditorFor(model => model.Active)
+                    @Html.ValidationMessageFor(model => model.Active, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" name="btnSubmit" value="Create" class="btn btn-default" />
+                <input type="button" onclick="resetForm(createDeptForm)" value="Clear" class="btn btn-default" />
+                <a href="@Url.Action("Index", "Dept")" class="btn btn-default">Cancel</a>
+
+            </div>
+        </div>
+
+        <div style="color:red">
+            @ViewBag.Message
+            <br>
+            <a href=@ViewBag.Link target="_blank">@ViewBag.Link</a>
+        </div>
+    </div>
+}

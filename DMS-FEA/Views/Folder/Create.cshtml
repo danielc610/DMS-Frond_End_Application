@@ -1,0 +1,213 @@
+﻿@using DMS_FEA.ViewModels
+@model CreateFolderViewModel
+
+@{
+    ViewBag.Title = "Manage Folders - Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<script>
+
+    function UpdateList(parent, level, list) {
+        $.ajax({
+            url: '@Url.Action("UpdateList", "Folder")',
+            data: { value: parent, lv: level },
+            dataType: "json",
+            type: "POST",
+            error: function () {
+                alert("Error !");
+            },
+            success: function (data) {
+                var items = "<option value= 0>" + "-- Choose from below --" + "</option>";
+                $.each(data, function (i, item) {
+                    items += "<option value=\"" + item.parID + "\"" + "name=\"" + item.name +  "\">" + item.name + "</option>";
+                });
+                $(list).html(items);
+                $(list).prop("disabled", false);
+                
+            }
+        });
+    }
+
+    function UpdateDeptList(parent, level, list) {
+        $.ajax({
+            url: '@Url.Action("UpdateDeptList", "Folder")',
+            data: { value: parent, lv: level },
+            dataType: "json",
+            type: "POST",
+            error: function () {
+                alert("Error !");
+            },
+            success: function (data) {
+                var items = "<option value= 0>" + "-- Choose from below --" + "</option>";
+                $.each(data, function (i, item) {
+                    items += "<option value=\"" + item.parID + "\"" + "name=\"" + item.name + "\">" + item.name + "</option>";
+                });
+                $(list).html(items);
+                $(list).prop("disabled", false);
+
+            }
+        });
+    }
+
+    function EmptyList(list) {
+
+    }
+
+    $(document).ready(function () {
+        var comp = $("#list1");
+        var dept = $("#list2");
+        var folder = $("#list3");
+        var defineFld = $("#defineFld")
+        var subfolderLv1 = $("#list4");
+        var defineFldLv1 = $("#defineFldLv1");
+        var subfolderLv2 = $("#box1");
+
+
+        if (folder.val() > 0 ) {
+            defineFld.prop("disabled", "disabled");
+        };
+        if (subfolderLv1.val() > 0) {
+            defineFldLv1.prop("disabled", "disabled");
+        };
+
+
+
+        comp.on("change", function () {
+            var compID = $(this).val();
+            if (compID != null) {
+                UpdateDeptList(compID, 2, dept);
+            }
+        });
+        dept.on("change", function () {
+            var deptID = $(this).val();
+            
+            if (deptID != null) {
+                UpdateList(deptID, 3, folder);
+            }
+        });
+
+        folder.on("change", function () {
+            var folderID = $(this).val();
+            if (folderID != null) {
+                UpdateList(folderID, 4, subfolderLv1);
+                defineFld.prop("disabled", "disabled");
+            }
+        });
+
+
+
+        subfolderLv1.on("change", function () {
+            var subfolderLv1ID = $(this).val();
+            if (subfolderLv1ID != null) {
+                subfolderLv2.prop("readonly", false);
+                defineFldLv1.prop("disabled", "disabled");
+
+            }
+        });
+        defineFld.on("click", function () {
+            defineFldLv1.prop("disabled", "disabled");
+        });
+        
+
+    })
+
+    $("#createFldForm").submit(function () {
+        $("#createFldForm: disabled").removeAttr('disabled');
+    })
+
+
+
+</script>
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+<h3>@ViewBag.Title</h3>
+<br />
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "createFldForm"}))
+{
+    @Html.AntiForgeryToken()
+
+
+    <div class="form-horizontal ">
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompList, htmlAttributes: new { @class = "control-label col-md-2" })
+
+            <div class="col-md-3">
+                @Html.DropDownList("CompList", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control", @id = "list1" })
+                @Html.ValidationMessageFor(model => model.CompList, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DeptList, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.DropDownList("DeptList", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control", @disabled = "disabled", @id = "list2" })
+                @Html.ValidationMessageFor(model => model.DeptList, "", new { @class = "text-danger" })
+            </div>
+
+        </div>
+
+        <div class="form-group" >
+            @Html.LabelFor(model => model.FolderList, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.DropDownList("FolderList", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control", @disabled = "disabled", @id = "list3" })
+
+                @Html.ValidationMessageFor(model => model.FolderList, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+                <input type="button" onclick="showbox(defineFolder, list3)" class="btn btn-default" value="Define New" id="defineFld" />
+            </div>
+            <div class="col-md-4" id="defineFolder" hidden="hidden">
+                    @Html.TextBoxFor(model => model.FolderName, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.FolderName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FolderLv1, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.DropDownList("FolderLv1", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control", @disabled = "disabled", @id = "list4" })
+                @Html.ValidationMessageFor(model => model.FolderLv1, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+                <input type="button" onclick="showbox(Subflderlv1, list4)" class="btn btn-default" value="Define New" id="defineFldLv1" />
+            </div>
+            <div class="form-group" id="Subflderlv1" hidden="hidden">
+                <div class="col-md-4">
+                    @Html.TextBoxFor(model => model.FolderLv1Name, htmlAttributes: new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.FolderLv1Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+           @Html.LabelFor(model => model.FolderLv2Name, htmlAttributes: new { @class ="control-label col-md-2"} )
+            <div class="col-md-3">
+                @Html.TextBoxFor(model => model.FolderLv2Name, htmlAttributes: new { @class = "form-control" , @readonly =true, @id="box1" })
+                @Html.ValidationMessageFor(model => model.FolderLv2Name, "", new { @class="text-danger"})
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" name="btnSubmit" value="Create" class="btn btn-default" />
+                <input type="button" onclick="resetForm(createFldForm)" value="Clear" class="btn btn-default" />
+                <a href="@Url.Action("Index","Folder")" class="btn btn-default">Cancel</a>
+            </div>
+        </div>
+
+        <div style="color:red">
+            @ViewBag.message
+        </div>
+
+    </div>
+}

@@ -1,0 +1,278 @@
+﻿@using DMS_FEA.ViewModels
+
+@model vmCreateBarCodeSheet
+
+@{
+    ViewBag.Title = "Generate BarCode Sheet";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="~/Scripts/Validations.js"></script>
+<script src="~/Scripts/jquery-3.2.1.js"></script>
+<script>
+
+    // Funtion = Update dropdown list
+    function UpdateList(parent, level, list) {
+        $.ajax({
+            url: '@Url.Action("UpdateList", "Folder")',
+            data: { value: parent, lv: level },
+            dataType: "json",
+            type: "POST",
+            error: function () {
+                alert("Error!");
+            },
+            success: function (data) {
+                var items = "<option value= 0>" + "-- Choose from below --" + "</option>";
+                $.each(data, function (i, item) {
+                    items += "<option value=\"" + item.parID + "\">" + item.name + "</option>";
+                });
+
+                $(list).html(items);
+                $(list).prop("disabled", false);
+            }
+        });
+    }
+
+    function getFldName(id) {
+        $.ajax({
+            url: '@Url.Action("GetFolderName", "Folder")',
+            data: { id: id },
+            dataType: "json",
+            type: "POST",
+            error: function () {
+                alert("Error!");
+            },
+            success: function (data) {
+                return data;
+            }
+        })
+    }
+
+    var defineNew = function (btnId) {
+        $(btnId).dialog({
+            autoOpen: false,
+            width: 400,
+            height: 300,
+            modal: true,
+            Title: 'Create new',
+            buttons: {
+                'Save': function () {
+
+                },
+                'Cancel': function () {
+                    $(this).dialog('close');
+                }
+            }
+
+        });
+    }
+
+
+    $(document).ready(function () {
+
+        var comp = $("#list1");
+        var dept = $("#list2");
+        var folder = $("#list3");
+        var subfolderlv1 = $("#list4");
+        var subfolderlv2 = $("#list5");
+
+
+        subfolderlv1.on('load', function () {
+            $(this).prop("disabled", true)
+        })
+
+
+        comp.on("change", function () {
+            var compID = $(this).val();
+            if (compID != null) {
+                UpdateList(compID, 2, dept);
+            }
+
+        });
+        dept.on("change", function () {
+            var deptID = $(this).val();
+
+            if (deptID != null) {
+                UpdateList(deptID, 3, folder);
+            }
+        });
+        folder.on("change", function () {
+            var folderID = $(this).val();
+            if (folderID != null) {
+                UpdateList(folderID, 4, subfolderlv1);
+            }
+        });
+        subfolderlv1.on("change", function () {
+            var subfolderLv1ID = $(this).val();
+            if (subfolderLv1ID != null) {
+                UpdateList(subfolderLv1ID, 5, subfolderlv2);
+            }
+        });
+
+        //When Form on submit, Get all Names
+        $("#createBarCodeForm").on("submit", function (evt) {
+            $("#SelectedCompany").val($("#list1 option:selected").text())
+            $("#SelectedDepartment").val($("#list2 option:selected").text())
+
+            var fld = $("#list3").val();
+            if (fld != null && fld > 0) {
+                $("#SelectedFolder").val($("#list3 option:selected").text());
+            } else {
+                $("#SelectedFolder").val(null);
+            }
+
+            var subfldLv1 = $("#list4").val();
+            if (subfldLv1 != null && subfldLv1 > 0) {
+                $("#SelectedSubFoldeLvl1").val($("#list4 option:selected").text());
+            } else {
+                $("#SelectedSubFoldeLvl2").val(null);
+            }
+
+            var subfldLv2 = $("#list5").val();
+            if (subfldLv2 != null && subfldLv2 > 0) {
+                $("#SelectedSubFoldeLvl2").val($("#list5 option:selected").text());
+
+            } else {
+                $("#SelectedSubFoldeLvl2").val(null);
+            }
+        });
+
+
+    });
+
+
+        function testjava() {
+
+            var display = $("#list2 option:selected").text();
+            alert(display);
+        }
+
+        function ResetForm() {
+            document.getElementById('TxtSO_No_Start').value = "";
+            document.getElementById('TxtSO_No_End').value = "";
+        }
+
+</script>
+
+<br>
+<h2>@ViewBag.Title</h2>
+
+
+<div class="row">
+    <div class="col-md-8">
+        <section id="loginForm">
+
+            @using (Html.BeginForm("Generate", "vCreateBarCodeSheet", FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "createBarCodeForm" }))
+
+            {
+                <h4>To create barcode sheet for document(s), please specify the file location to save the documents by entering below fields: </h4>
+                <hr />
+
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.CompList, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("CompList", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control", @id = "list1" })
+                            @Html.ValidationMessageFor(model => model.CompList, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.DeptList, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("DeptList", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control",  @id = "list2" })
+                            @Html.ValidationMessageFor(model => model.DeptList, "", new { @class = "text-danger" })
+                        </div>
+                        <div id="deptDialog" class="hidden">
+
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FolderList, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("FolderList", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control",  @id = "list3" })
+                            @Html.ValidationMessageFor(model => model.FolderList, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SubFolderLv1, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("SubFolderLv1", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control", @id = "list4" })
+                            @Html.ValidationMessageFor(model => model.SubFolderLv1, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SubFolderLv2, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("SubFolderLv2", null, "-- Choose from below --", htmlAttributes: new { @class = "form-control", @disabled = "disabled", @id = "list5" })
+                            @Html.ValidationMessageFor(model => model.SubFolderLv1, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.BC_KeepBarCodePage, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("BC_KeepBarCodePage", ViewBag.BC_KeepBarCodePage as SelectList, htmlAttributes: new { @class = "form-control", @id = "list6" })
+                            @Html.ValidationMessageFor(model => model.BC_KeepBarCodePage, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.BC_File_Name, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.BC_File_Name, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.BC_File_Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.BC_No_Start, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.BC_No_Start, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.BC_No_Start, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.BC_No_End, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.BC_No_End, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.BC_No_End, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.SelectedCompany, new { style = "display: none" })
+                            @Html.TextBoxFor(m => m.SelectedDepartment, new { style = "display: none" })
+                            @Html.TextBoxFor(m => m.SelectedFolder, new { style = "display: none" })
+                            @Html.TextBoxFor(m => m.SelectedSubFoldeLvl1, new { style = "display: none" })
+                            @Html.TextBoxFor(m => m.SelectedSubFoldeLvl2, new { style = "display: none" })
+
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" name="BtnSubmit" value="Create" class="btn btn-default" />
+                            <input type="button" onclick="resetForm(createBarCodeForm)" value="Clear" class="btn btn-default" />
+                            <a href="@Url.Action("Index","Home")" class="btn btn-default">Cancel</a>
+                        </div>
+
+
+                        <div style="color:red">
+                            @ViewBag.Message
+                            <br>
+                            <a href=@ViewBag.Link target="_blank">@ViewBag.Link</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </section>
+
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,45 @@
+﻿@using System.Web.Mvc
+
+@if (Request.IsAuthenticated)
+{
+
+    using (Html.BeginForm("LogOff", "User", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+    }
+
+    
+    <div class="navbar-collapse collapse">
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown">Welcome @User.Identity.Name ! <span class="caret"></span></a>
+            
+                <ul class="dropdown-menu">
+                    <li>
+                        @{ FormsIdentity identity = (FormsIdentity)Context.User.Identity;
+                        var userData = FormsAuthentication.Decrypt(Request.Cookies[FormsAuthentication.FormsCookieName].Value).UserData;
+                        string[] data = userData.Split(",".ToCharArray());
+                        string userID = data[0];
+                        string userRole = data[1];
+
+                        }
+                        <a href="@Url.Action("ChangePwd", "User", new { id = userID })"> Change Password</a>
+                    </li>
+                </ul>
+            </li>
+        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+        <li>@Html.ActionLink("About", "About", "Home")</li>
+        </ul>
+    </div>
+}
+
+else
+{
+<ul class="nav navbar-nav navbar-right">
+
+    <li>@Html.ActionLink("Log in", "Login", "User", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    <li>@Html.ActionLink("About", "About", "Home")</li>
+</ul>
+}
+

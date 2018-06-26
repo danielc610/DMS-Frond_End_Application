@@ -1,0 +1,57 @@
+﻿@using DMS_FEA.ViewModels
+@model ResetPasswordViewModel
+
+
+@{
+    ViewBag.Title = "Manage Users - Change Password";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>@ViewBag.Title</h3>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.DocNum)
+
+       <div class="form-group">
+           @Html.LabelFor(model => model.User_Code, htmlAttributes: new { @class = "control-label col-md-2"})
+           <div class="col-md-10">
+               @Html.EditorFor(model => model.User_Code, new { htmlAttributes = new {@class = "form-control", @readonly = "readonly" }})
+           </div>
+       </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ConfirmPassword, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" name="btnSubmit" value="Save" class="btn btn-default" />
+                <a href="@Url.Action("Index", "User")" class="btn btn-default"> Cancel</a>
+            </div>
+        </div>
+
+        <div style="color:red">
+            @ViewBag.message
+        </div>
+    </div>
+}

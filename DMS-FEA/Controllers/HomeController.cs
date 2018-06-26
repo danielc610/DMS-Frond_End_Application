@@ -6,13 +6,21 @@ using System.Web.Mvc;
 
 namespace DMS_FEA.Controllers
 {
+    
     public class HomeController : Controller
     {
+        
         public ActionResult Index()
         {
-            return View();
+            if (Request.IsAuthenticated)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "User");
+            }
         }
-
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
@@ -20,11 +28,6 @@ namespace DMS_FEA.Controllers
             return View();
         }
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
 
-            return View();
-        }
     }
 }

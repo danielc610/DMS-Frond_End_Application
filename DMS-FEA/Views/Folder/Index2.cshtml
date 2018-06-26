@@ -1,0 +1,76 @@
+﻿@model IEnumerable<DMS_FEA.Models.OFOT>
+@using System.Web.UI.WebControls
+@using DMS_FEA.Models;
+
+@{
+    ViewBag.Title = "Manage Folders - Overview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section scripts
+{
+    <script>
+        $(function () {
+            var selectedData;
+        $('#jstree').jstree({
+            'core': {
+                'multiple': true,
+                'check_callback': false,
+                'themes': {
+                    'responsive': true,
+                    'variant' : 'larg',
+                    'stripes': false,
+                    'dots' : false
+                }
+            },
+                "types": {
+                    "file": {
+                        "icon": "fa fa-file icon-state-warning icon-lg"
+                    }
+                },
+                "plugins": ["state", "types", "sort", "contextmenu"]
+            });
+        });
+</script>
+}
+
+
+   
+
+
+<h3>@ViewBag.Title</h3>
+
+@using (Html.BeginForm("Index", "Folder", FormMethod.Get))
+{
+    <div class="form-group">
+        @Html.Label("Name", htmlAttributes: new { @class = "control-label col-md-1" })
+        <div class="col-md-3">
+            @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, htmlAttributes: new { @class = "form-control" })
+        </div>
+        <div class="col-md-6">
+            <input type="submit" value="Search" class="btn btn-default" />
+        </div>
+        <div class="col-md-2">
+            <a href="@Url.Action("Create","Folder")" , class="btn btn-default" )>Create Folder</a>
+        </div>
+        <br /><br />
+    </div>
+}
+
+<div class="form-body" style="overflow-x:auto">
+    <div class="col-md-12" id="jstree">
+        @(Html.TreeView(Model)
+                          .EmptyContent("Drive M")
+                          .Children(m => m.Childs)
+                          .HtmlAttributes(new { id = "tree" })
+                      .ChildrenHtmlAttributes(new { @class = "subItem" })
+                          .ItemText(m => m.Fname)
+                          .ItemTemplate(
+        @<text>
+            <a href="@item.Fname" desc="@item.Fname">@item.Fname</a>
+        </text>)
+        )
+    </div>
+
+</div>
+

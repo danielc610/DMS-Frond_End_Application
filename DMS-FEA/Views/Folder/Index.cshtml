@@ -1,0 +1,105 @@
+﻿@model PagedList.IPagedList<DMS_FEA.ViewModels.FolderIndexViewModel>
+@using PagedList.Mvc
+
+@{
+    ViewBag.Title = "Manage Folders - Overview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>@ViewBag.Title</h3>
+<br />
+
+@{ int rowNo = 0;}
+
+@using (Html.BeginForm("Index", "Folder", FormMethod.Get))
+{
+    <div class="form-group">
+        @Html.Label("Folder Name", htmlAttributes: new { @class = "control-label col-sm-1"})
+        <div class="col-md-3">
+            @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, htmlAttributes: new { @class = "form-control"} )
+        </div>
+        <div class="col-md-6">
+            <input type="submit" value="Search" class="btn btn-default" />
+        </div>
+        <div class="col-md-2">
+            <a href="@Url.Action("Create", "Folder")", class="btn btn-default">Create Folder</a>
+        </div>
+        <br /><br />
+    </div>
+}
+<div style="overflow-x:auto">
+    <div class="table">
+        <table class="table col-md-12" style="table-layout:fixed">
+            <tr>
+                <th class="col-sm-1" style="text-align:center">
+                    #
+                </th>
+                <th class="col-md-2">
+                    @Html.ActionLink("Company Folder", "Index", new { sortOrder = ViewBag.CompNameSortParm, currentFilter = ViewBag.CurrentFilter })
+                </th>
+                <th class="col-md-2">
+                    @Html.ActionLink("Department Folder", "Index", new { sortOrder = ViewBag.DeptNameSortParm, currentFilter = ViewBag.CurrentFilter })
+                </th>
+                <th class="col-md-2">
+                    @Html.ActionLink("Folder", "Index", new { sortOrder = ViewBag.FolderSortParm, currentFilter = ViewBag.CurrentFilter })
+                </th>
+                <th class="col-md-2">
+                    @Html.ActionLink("Sub-Folder Level 1", "Index", new { sortOrder = ViewBag.SubFldLv1SortParm, currentFilter = ViewBag.CurrentFilter })
+                </th>
+                <th class="col-md-2">
+                    @Html.ActionLink("Sub-Folder Level 2", "Index", new { sortOrder = ViewBag.SubFldLv2SortParm, currentFilter = ViewBag.CurrentFilter })
+                </th>
+                <th class="col-md-3">
+                    Folder Path
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                var size = int.Parse(Model.PageSize.ToString());
+                var pageNumber = Model.PageNumber - 1;
+                rowNo += 1 ;
+                <tr>
+                    <td style="text-align: center">
+                        @(rowNo + size*pageNumber) 
+                    </td>
+                    <td>
+                       @Html.DisplayFor(modelItem => item.CompName)
+                    </td>
+                    <td>
+                       @Html.DisplayFor(modelItem => item.DeptName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FolderName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubFolderLv1)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubFolderLv2)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FolderPath)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<br />
+
+<div class="pagination">
+    Page @(Model.PageCount<Model.PageNumber? 0: Model.PageNumber) of @Model.PageCount
+
+    @Html.PagedListPager(Model, page => Url.Action("Index", new { page, sortOrder= ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter}))
+</div>
